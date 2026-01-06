@@ -355,6 +355,93 @@ async def delete_project(project_id: str, payload: dict = Depends(verify_token))
         raise HTTPException(status_code=404, detail="Project not found")
     return {"message": "Project deleted successfully"}
 
+# Client Reviews Endpoints
+@api_router.post("/reviews", response_model=ReviewResponse)
+async def create_review(
+    review_data: ReviewCreate,
+    payload: dict = Depends(verify_token)
+):
+    """Create a new client review (admin only)"""
+    try:
+        review = {
+            "id": str(uuid.uuid4()),
+            "client_name": review_data.client_name,
+            "review_text": review_data.review_text,
+            "star_rating": review_data.star_rating,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.reviews.insert_one(review)
+        logger.info(f"Successfully created review with ID: {review['id']}")
+        
+        return ReviewResponse(**review)
+    except Exception as e:
+        logger.error(f"Error creating review: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to create review: {str(e)}")
+
+@api_router.get("/reviews", response_model=List[ReviewResponse])
+async def get_reviews():
+    """Get all client reviews (public endpoint)"""
+    try:
+        reviews = await db.reviews.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        return [ReviewResponse(**review) for review in reviews]
+    except Exception as e:
+        logger.error(f"Error fetching reviews: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch reviews")
+
+@api_router.get("/reviews/{review_id}", response_model=ReviewResponse)
+async def get_review(review_id: str):
+    """Get a specific review by ID"""
+    review = await db.reviews.find_one({"id": review_id}, {"_id": 0})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return ReviewResponse(**review)
+
+@api_router.put("/reviews/{review_id}")
+async def update_review(
+    review_id: str,
+    review_data: ReviewUpdate,
+    payload: dict = Depends(verify_token)
+):
+    """Update an existing review (admin only)"""
+    try:
+        update_data = {k: v for k, v in review_data.model_dump().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No data to update")
+        
+        result = await db.reviews.update_one(
+            {"id": review_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Review not found")
+        
+        logger.info(f"Successfully updated review: {review_id}")
+        return {"message": "Review updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating review: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to update review: {str(e)}")
+
+@api_router.delete("/reviews/{review_id}")
+async def delete_review(review_id: str, payload: dict = Depends(verify_token)):
+    """Delete a review (admin only)"""
+    try:
+        result = await db.reviews.delete_one({"id": review_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Review not found")
+        
+        logger.info(f"Successfully deleted review: {review_id}")
+        return {"message": "Review deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting review: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to delete review: {str(e)}")
+
 # Site Settings Endpoints
 @api_router.get("/site-settings")
 async def get_site_settings():
