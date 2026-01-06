@@ -68,6 +68,7 @@ export default function AdminDashboard({ onLogout }) {
     fetchDashboardStats();
     fetchProjects();
     fetchSiteSettings();
+    fetchReviews();
   }, []);
 
   const fetchDashboardStats = async () => {
