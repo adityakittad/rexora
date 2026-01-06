@@ -255,6 +255,92 @@ export default function AdminDashboard({ onLogout }) {
     }
   };
 
+  // Reviews Functions
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`${API}/reviews`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      toast.error('Failed to fetch reviews');
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!reviewForm.client_name || !reviewForm.review_text) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const token = localStorage.getItem('admin_token');
+    
+    try {
+      await axios.post(`${API}/reviews`, reviewForm, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      toast.success('Review added successfully!');
+      setReviewForm({ client_name: '', review_text: '', star_rating: 5 });
+      fetchReviews();
+    } catch (error) {
+      console.error('Error adding review:', error);
+      toast.error('Failed to add review');
+    }
+  };
+
+  const handleEditReviewClick = (review) => {
+    setEditingReview(review);
+    setEditReviewForm({
+      client_name: review.client_name,
+      review_text: review.review_text,
+      star_rating: review.star_rating
+    });
+  };
+
+  const handleEditReviewSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('admin_token');
+
+    try {
+      await axios.put(`${API}/reviews/${editingReview.id}`, editReviewForm, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      toast.success('Review updated successfully!');
+      setEditingReview(null);
+      fetchReviews();
+    } catch (error) {
+      console.error('Error updating review:', error);
+      toast.error('Failed to update review');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return;
+    
+    const token = localStorage.getItem('admin_token');
+    
+    try {
+      await axios.delete(`${API}/reviews/${reviewId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Review deleted successfully');
+      fetchReviews();
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast.error('Failed to delete review');
+    }
+  };
+
   // Site Settings Functions
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
