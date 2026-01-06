@@ -509,6 +509,18 @@ export default function AdminDashboard({ onLogout }) {
             Projects
           </button>
           <button
+            onClick={() => setActiveTab('reviews')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'reviews'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-[#a1a1aa] hover:text-white'
+            }`}
+            data-testid="reviews-tab"
+          >
+            <Edit className="w-4 h-4 inline mr-2" />
+            Client Reviews
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`px-6 py-3 font-medium transition-colors ${
               activeTab === 'settings'
