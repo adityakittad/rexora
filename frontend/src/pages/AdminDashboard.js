@@ -1227,6 +1227,92 @@ export default function AdminDashboard({ onLogout }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Edit Review Modal */}
+      <AnimatePresence>
+        {editingReview && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setEditingReview(null)}
+            data-testid="edit-review-modal-overlay"
+          >
+            <motion.div
+              className="glass-card p-8 rounded-lg max-w-2xl w-full relative"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              data-testid="edit-review-modal"
+            >
+              <button
+                onClick={() => setEditingReview(null)}
+                className="absolute top-4 right-4 text-[#a1a1aa] hover:text-white transition-colors"
+                data-testid="close-edit-review-button"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-8">
+                <Edit className="w-8 h-8 text-[#D4AF37]" />
+                <h2 className="text-2xl font-bold">Edit Review</h2>
+              </div>
+
+              <form onSubmit={handleEditReviewSubmit} className="space-y-6" data-testid="edit-review-form">
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Client Name *</label>
+                  <input
+                    type="text"
+                    value={editReviewForm.client_name}
+                    onChange={(e) => setEditReviewForm({ ...editReviewForm, client_name: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    required
+                    data-testid="edit-review-client-name-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Review Text *</label>
+                  <textarea
+                    value={editReviewForm.review_text}
+                    onChange={(e) => setEditReviewForm({ ...editReviewForm, review_text: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors resize-none"
+                    required
+                    data-testid="edit-review-text-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Star Rating *</label>
+                  <select
+                    value={editReviewForm.star_rating}
+                    onChange={(e) => setEditReviewForm({ ...editReviewForm, star_rating: parseInt(e.target.value) })}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    data-testid="edit-review-star-rating-select"
+                  >
+                    <option value={5}>5 Stars - ★★★★★</option>
+                    <option value={4}>4 Stars - ★★★★☆</option>
+                    <option value={3}>3 Stars - ★★★☆☆</option>
+                    <option value={2}>2 Stars - ★★☆☆☆</option>
+                    <option value={1}>1 Star - ★☆☆☆☆</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full btn-primary"
+                  data-testid="edit-review-submit-button"
+                >
+                  Update Review
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
