@@ -110,6 +110,32 @@ class SiteSettingsUpdate(BaseModel):
     instagram_url: Optional[str] = None
     contact_email: Optional[str] = None
 
+class Review(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    client_name: str
+    review_text: str
+    star_rating: int = Field(ge=1, le=5)  # Rating between 1 and 5
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ReviewCreate(BaseModel):
+    client_name: str
+    review_text: str
+    star_rating: int = Field(ge=1, le=5)
+
+class ReviewUpdate(BaseModel):
+    client_name: Optional[str] = None
+    review_text: Optional[str] = None
+    star_rating: Optional[int] = Field(None, ge=1, le=5)
+
+class ReviewResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    client_name: str
+    review_text: str
+    star_rating: int
+    created_at: str
+
 def create_token(email: str) -> str:
     payload = {
         'email': email,
