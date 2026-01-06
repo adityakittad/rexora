@@ -19,6 +19,7 @@ export default function HomePage({ onCreditsClick }) {
   useEffect(() => {
     fetchProjects();
     fetchSiteSettings();
+    fetchReviews();
   }, []);
 
   const fetchProjects = async () => {
@@ -36,6 +37,15 @@ export default function HomePage({ onCreditsClick }) {
       setSiteSettings(response.data);
     } catch (error) {
       console.error('Error fetching site settings:', error);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`${API}/reviews`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
     }
   };
 
