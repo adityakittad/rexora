@@ -459,6 +459,51 @@ export default function HomePage({ onCreditsClick }) {
         </div>
       </section>
 
+      {/* Client Reviews Section */}
+      {reviews.length > 0 && (
+        <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#0a0a0a]" data-testid="reviews-section">
+          <motion.h2 
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-16 text-center tracking-tight"
+            {...fadeUp}
+          >
+            Client Reviews
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {reviews.map((review, index) => (
+              <motion.div
+                key={review.id}
+                className="glass-card p-8 rounded-lg"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                data-testid={`review-card-${index}`}
+              >
+                {/* Star Rating */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-[#D4AF37] text-2xl" data-testid={`review-stars-${index}`}>
+                    {'★'.repeat(review.star_rating)}{'☆'.repeat(5 - review.star_rating)}
+                  </div>
+                </div>
+
+                {/* Review Text */}
+                <p className="text-[#a1a1aa] text-base leading-relaxed mb-6 italic">
+                  "{review.review_text}"
+                </p>
+
+                {/* Client Name */}
+                <div className="border-t border-[rgba(255,255,255,0.08)] pt-4">
+                  <p className="font-bold text-white" data-testid={`review-client-name-${index}`}>
+                    {review.client_name}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Contact Section */}
       <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-[#0a0a0a]" data-testid="contact-section">
         <div className="max-w-2xl mx-auto">
