@@ -753,6 +753,129 @@ export default function AdminDashboard({ onLogout }) {
           </>
         )}
 
+        {/* Reviews Tab */}
+        {activeTab === 'reviews' && (
+          <>
+            {/* Add Review Form */}
+            <motion.div
+              className="glass-card p-8 rounded-lg mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              data-testid="add-review-form"
+            >
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Plus className="w-6 h-6 text-[#D4AF37]" />
+                Add New Review
+              </h2>
+
+              <form onSubmit={handleReviewSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Client Name *</label>
+                  <input
+                    type="text"
+                    value={reviewForm.client_name}
+                    onChange={(e) => setReviewForm({ ...reviewForm, client_name: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    required
+                    data-testid="review-client-name-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Review Text *</label>
+                  <textarea
+                    value={reviewForm.review_text}
+                    onChange={(e) => setReviewForm({ ...reviewForm, review_text: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors resize-none"
+                    required
+                    data-testid="review-text-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#a1a1aa] mb-2">Star Rating *</label>
+                  <select
+                    value={reviewForm.star_rating}
+                    onChange={(e) => setReviewForm({ ...reviewForm, star_rating: parseInt(e.target.value) })}
+                    className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    data-testid="review-star-rating-select"
+                  >
+                    <option value={5}>5 Stars - ★★★★★</option>
+                    <option value={4}>4 Stars - ★★★★☆</option>
+                    <option value={3}>3 Stars - ★★★☆☆</option>
+                    <option value={2}>2 Stars - ★★☆☆☆</option>
+                    <option value={1}>1 Star - ★☆☆☆☆</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full btn-primary flex items-center justify-center gap-2"
+                  data-testid="add-review-submit-button"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add Review
+                </button>
+              </form>
+            </motion.div>
+
+            {/* Reviews List */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Manage Reviews ({reviews.length})</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {reviews.map((review, index) => (
+                  <motion.div
+                    key={review.id}
+                    className="glass-card p-6 rounded-lg"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    data-testid={`review-item-${index}`}
+                  >
+                    <div className="mb-4">
+                      <h3 className="text-lg font-bold mb-2">{review.client_name}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="text-[#D4AF37] text-xl">
+                          {'★'.repeat(review.star_rating)}{'☆'.repeat(5 - review.star_rating)}
+                        </div>
+                        <span className="text-sm text-[#a1a1aa]">({review.star_rating}/5)</span>
+                      </div>
+                      <p className="text-sm text-[#a1a1aa] leading-relaxed">{review.review_text}</p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditReviewClick(review)}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#D4AF37] hover:bg-[#c9a332] text-black rounded-lg transition-colors"
+                        data-testid={`edit-review-${index}`}
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                        data-testid={`delete-review-${index}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {reviews.length === 0 && (
+                <div className="text-center py-12 text-[#a1a1aa]">
+                  <p>No reviews added yet. Add your first review above!</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {/* Site Settings Tab */}
         {activeTab === 'settings' && siteSettings && (
           <motion.div
