@@ -33,6 +33,20 @@ export default function AdminDashboard({ onLogout }) {
     recent_projects: 0
   });
   
+  // Reviews State
+  const [reviews, setReviews] = useState([]);
+  const [reviewForm, setReviewForm] = useState({
+    client_name: '',
+    review_text: '',
+    star_rating: 5
+  });
+  const [editingReview, setEditingReview] = useState(null);
+  const [editReviewForm, setEditReviewForm] = useState({
+    client_name: '',
+    review_text: '',
+    star_rating: 5
+  });
+  
   // Site Settings State
   const [siteSettings, setSiteSettings] = useState(null);
   const [settingsForm, setSettingsForm] = useState({
