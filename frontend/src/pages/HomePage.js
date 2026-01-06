@@ -14,6 +14,7 @@ export default function HomePage({ onCreditsClick }) {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [siteSettings, setSiteSettings] = useState(null);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     fetchProjects();
