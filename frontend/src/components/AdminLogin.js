@@ -4,8 +4,11 @@ import axios from 'axios';
 import { X, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// ✅ SINGLE SOURCE OF TRUTH
+const API =
+  (process.env.REACT_APP_BACKEND_URL
+    ? process.env.REACT_APP_BACKEND_URL.replace(/\/$/, '')
+    : 'http://127.0.0.1:8000') + '/api';
 
 export default function AdminLogin({ onClose, onLoginSuccess }) {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -16,14 +19,45 @@ export default function AdminLogin({ onClose, onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API}/admin/login`, credentials);
-      localStorage.setItem('admin_token', response.data.token);
-      toast.success('Login successful!');
-      onLoginSuccess();
-      window.location.href = '/admin';
+      const payload = {
+        email: credentials.email.trim(),
+        password: credentials.password.trim(),
+      };
+
+      console.log('Admin login →', `${API}/admin/login`, payload.email);
+
+      const response = await axios.post(
+        `${API}/admin/login`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const token = response?.data?.token;
+
+      if (!token) {
+        throw new Error('Token missing in response');
+      }
+
+      // ✅ CONSISTENT TOKEN KEY
+      localStorage.setItem('rexora_admin_token', token);
+
+      toast.success('Login successful');
+
+      onLoginSuccess?.();
+      onClose?.();
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Invalid credentials');
+      console.error('Admin login error:', error);
+
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Invalid credentials';
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -37,7 +71,6 @@ export default function AdminLogin({ onClose, onLoginSuccess }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        data-testid="admin-login-overlay"
       >
         <motion.div
           className="glass-card p-8 rounded-lg max-w-md w-full relative"
@@ -45,12 +78,10 @@ export default function AdminLogin({ onClose, onLoginSuccess }) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          data-testid="admin-login-modal"
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-[#a1a1aa] hover:text-white transition-colors"
-            data-testid="close-login-button"
+            className="absolute top-4 right-4 text-[#a1a1aa] hover:text-white"
           >
             <X className="w-6 h-6" />
           </button>
@@ -60,16 +91,17 @@ export default function AdminLogin({ onClose, onLoginSuccess }) {
             <h2 className="text-2xl font-bold">Admin Login</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm text-[#a1a1aa] mb-2">Email</label>
               <input
                 type="email"
                 value={credentials.email}
-                onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, email: e.target.value })
+                }
                 required
-                data-testid="login-email-input"
+                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white"
               />
             </div>
 
@@ -78,18 +110,18 @@ export default function AdminLogin({ onClose, onLoginSuccess }) {
               <input
                 type="password"
                 value={credentials.password}
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, password: e.target.value })
+                }
                 required
-                data-testid="login-password-input"
+                className="w-full px-4 py-3 bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] rounded-lg text-white"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="login-submit-button"
+              className="w-full btn-primary disabled:opacity-50"
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>

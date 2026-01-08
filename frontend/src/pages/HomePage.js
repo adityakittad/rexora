@@ -516,12 +516,12 @@ export default function HomePage({ onCreditsClick }) {
           
           <motion.div className="text-center mb-8" {...fadeUp}>
             <a 
-              href={`mailto:${siteSettings?.contact_email || 'rexoramedia10@gmail.com'}`}
+              href={`mailto:${siteSettings?.contact_email || 'rexoramedia@gmail.com'}`}
               className="text-[#D4AF37] text-lg hover:underline inline-flex items-center gap-2"
               data-testid="contact-email"
             >
               <Mail className="w-5 h-5" />
-              {siteSettings?.contact_email || 'rexoramedia10@gmail.com'}
+              {siteSettings?.contact_email || 'rexoramedia@gmail.com'}
             </a>
           </motion.div>
 
@@ -578,7 +578,7 @@ export default function HomePage({ onCreditsClick }) {
 
       {/* Footer with Credits */}
       <footer className="py-12 px-6 text-center text-[#a1a1aa] border-t border-[rgba(255,255,255,0.08)]">
-        <p>&copy; 2025 Rexora Media. All rights reserved.</p>
+        <p>&copy; 2026 Rexora Media. All rights reserved.</p>
         <button 
           onClick={onCreditsClick}
           className="mt-2 text-[#a1a1aa] hover:text-[#D4AF37] transition-colors cursor-pointer text-sm"
